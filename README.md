@@ -88,7 +88,7 @@ uv run python -m simple_evals --list-models
 
 Supported models:
 - OpenAI: GPT-5, GPT-5.1, GPT-4.1, GPT-4o, GPT-4.5-preview, o1, o3, o4-mini, etc.
-- Claude: Claude 3 Opus, Claude 3.5 Sonnet, Claude 3 Sonnet, Claude 3 Haiku
+- Claude: Claude Sonnet 4.5, Claude Haiku 4.5, Claude Opus 4.1, Claude 3.5 Sonnet (legacy), etc.
 - Ollama: llama3.1, llama3.2, qwen, gemma3, etc.
 
 
@@ -223,13 +223,7 @@ uv run python -m simple_evals --eval=mmlu --model=gpt-4o --debug
 
 ## Environment Variables
 
-```bash
-# OpenAI API Key (for GPT models)
-export OPENAI_API_KEY=your-openai-api-key
-
-# Anthropic API Key (for Claude models)
-export ANTHROPIC_API_KEY=your-anthropic-api-key
-```
+Use `.env` file to set environment variables. Check the `.env.example` file for the required variables.
 
 ## Data Files
 

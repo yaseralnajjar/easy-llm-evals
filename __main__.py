@@ -287,7 +287,20 @@ def main():
             model="gpt-4-turbo-2024-04-09",
             system_message=OPENAI_SYSTEM_MESSAGE_CHATGPT,
         ),
-        # Claude models
+        # Claude models - Latest Claude 4.5 series
+        "claude-sonnet-4-5": lambda: ClaudeCompletionSampler(
+            model="claude-sonnet-4-5-20250929",
+            system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+        ),
+        "claude-haiku-4-5": lambda: ClaudeCompletionSampler(
+            model="claude-haiku-4-5-20251001",
+            system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+        ),
+        "claude-opus-4-1": lambda: ClaudeCompletionSampler(
+            model="claude-opus-4-1-20250805",
+            system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+        ),
+        # Claude legacy models
         "claude-3-opus": lambda: ClaudeCompletionSampler(
             model="claude-3-opus-20240229",
             system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
