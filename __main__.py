@@ -74,9 +74,9 @@ def main():
     parser.add_argument(
         "--reasoning-effort",
         type=str,
-        choices=["low", "medium", "high"],
+        choices=["minimal", "low", "medium", "high"],
         default=None,
-        help="Reasoning effort for reasoning models (low=faster, high=better quality). Applies to GPT-5, GPT-5.1, o3, o4-mini, etc.",
+        help="Reasoning effort for reasoning models (minimal=fastest, low=faster, medium=balanced, high=best quality). Applies to GPT-5, GPT-5.1, o3, o4-mini, etc.",
     )
 
     args = parser.parse_args()
