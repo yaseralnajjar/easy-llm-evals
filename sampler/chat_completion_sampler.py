@@ -64,12 +64,22 @@ class ChatCompletionSampler(SamplerBase):
         trial = 0
         while True:
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=message_list,
-                    temperature=self.temperature,
-                    max_tokens=self.max_tokens,
-                )
+                # GPT-5 and later models use different parameters
+                if self.model.startswith("gpt-5"):
+                    # GPT-5 uses max_completion_tokens and only supports temperature=1.0
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=message_list,
+                        max_completion_tokens=self.max_tokens,
+                        # Note: GPT-5 only supports temperature=1.0, so we omit it to use default
+                    )
+                else:
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=message_list,
+                        temperature=self.temperature,
+                        max_tokens=self.max_tokens,
+                    )
                 content = response.choices[0].message.content
                 if content is None:
                     raise ValueError("OpenAI API returned empty response; retrying")

@@ -153,6 +153,36 @@ def main():
             model="o3-mini",
             reasoning_effort="low",
         ),
+        # GPT-5 models - All GPT-5 models are reasoning models using ResponsesSampler
+        "gpt-5": lambda: ResponsesSampler(
+            model="gpt-5",
+            reasoning_model=True,
+        ),
+        "gpt-5-2025-02-27": lambda: ResponsesSampler(
+            model="gpt-5-2025-02-27",
+            reasoning_model=True,
+        ),
+        "gpt-5-pro": lambda: ResponsesSampler(
+            model="gpt-5-pro",
+            reasoning_model=True,
+        ),
+        "gpt-5-mini": lambda: ResponsesSampler(
+            model="gpt-5-mini",
+            reasoning_model=True,
+        ),
+        "gpt-5-nano": lambda: ResponsesSampler(
+            model="gpt-5-nano",
+            reasoning_model=True,
+        ),
+        # GPT-5.1 models - All GPT-5.1 models are reasoning models
+        "gpt-5.1": lambda: ResponsesSampler(
+            model="gpt-5.1",
+            reasoning_model=True,
+        ),
+        "gpt-5.1-2025-04-14": lambda: ResponsesSampler(
+            model="gpt-5.1-2025-04-14",
+            reasoning_model=True,
+        ),
         # GPT-4.1 models
         "gpt-4.1": lambda: ChatCompletionSampler(
             model="gpt-4.1-2025-04-14",
@@ -212,53 +242,6 @@ def main():
             model="gpt-4.5-preview-2025-02-27",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
-        ),
-        # GPT-5 models
-        "gpt-5": lambda: ChatCompletionSampler(
-            model="gpt-5",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
-        ),
-        "gpt-5-2025-02-27": lambda: ChatCompletionSampler(
-            model="gpt-5-2025-02-27",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
-        ),
-        "gpt-5-pro": lambda: ChatCompletionSampler(
-            model="gpt-5-pro",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
-        ),
-        "gpt-5-mini": lambda: ChatCompletionSampler(
-            model="gpt-5-mini",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
-        ),
-        "gpt-5-nano": lambda: ChatCompletionSampler(
-            model="gpt-5-nano",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
-        ),
-        # GPT-5.1 models
-        "gpt-5.1": lambda: ChatCompletionSampler(
-            model="gpt-5.1",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
-        ),
-        "gpt-5.1-2025-04-14": lambda: ChatCompletionSampler(
-            model="gpt-5.1-2025-04-14",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
-        ),
-        "gpt-5.1-mini": lambda: ChatCompletionSampler(
-            model="gpt-5.1-mini",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
-        ),
-        "gpt-5.1-nano": lambda: ChatCompletionSampler(
-            model="gpt-5.1-nano",
-            system_message=OPENAI_SYSTEM_MESSAGE_API,
-            max_tokens=4096,
         ),
         # GPT-4-turbo model
         "gpt-4-turbo-2024-04-09": lambda: ChatCompletionSampler(
@@ -389,7 +372,7 @@ def main():
                 return MathEval(
                     equality_checker=equality_checker(),
                     num_examples=num_examples,
-                    n_repeats=1 if debug_mode else args.n_repeats or 10,
+                    n_repeats=1 if (debug_mode or num_examples is not None) else args.n_repeats or 10,
                 )
             case "gpqa":
                 return GPQAEval(

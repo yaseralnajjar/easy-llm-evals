@@ -2,7 +2,6 @@
 
 A lightweight library for evaluating language models across multiple benchmarks including MMLU, MATH, GPQA, MGSM, DROP, HumanEval, SimpleQA, BrowseComp, and HealthBench.
 
-It's forked from both OpenAI's simple-evals and kayzi0's simple-evals: https://github.com/openai/simple-evals and https://github.com/kayzi0/simple-evals
 
 ## Overview
 
@@ -92,14 +91,6 @@ Supported models:
 - Claude: Claude 3 Opus, Claude 3.5 Sonnet, Claude 3 Sonnet, Claude 3 Haiku
 - Ollama: llama3.1, llama3.2, qwen, gemma3, etc.
 
-**New: GPT-5 Models**
-- `gpt-5` - Latest GPT-5 base model (4096 tokens)
-- `gpt-5-pro` - Enhanced reasoning and better answers
-- `gpt-5-mini` - Faster, more efficient variant
-- `gpt-5-nano` - Fastest, most cost-effective
-- `gpt-5.1` - Latest GPT-5.1 base model
-- `gpt-5.1-mini` - GPT-5.1 efficient variant
-- `gpt-5.1-nano` - GPT-5.1 fastest variant
 
 ### List Available Evaluations
 
@@ -212,9 +203,7 @@ export ANTHROPIC_API_KEY=your-anthropic-api-key
 
 ## Data Files
 
-The HealthBench main dataset has been pre-downloaded to `data/2025-05-07-06-14-12_oss_eval.jsonl`.
-
-Other benchmarks load data from URLs by default, but can be downloaded locally using the justfile commands for better performance.
+All benchmarks load data from URLs by default, but can be downloaded locally using the justfile commands for better performance.
 
 ## Notes
 
@@ -227,6 +216,8 @@ Other benchmarks load data from URLs by default, but can be downloaded locally u
 ## Attribution
 
 This fork is based on OpenAI's simple-evals: https://github.com/openai/simple-evals
+
+And `kayzi0` simple-evals fork: https://github.com/kayzi0/simple-evals
 
 Individual benchmark citations and licenses can be found in the original repository.
 
