@@ -133,8 +133,9 @@ uv run python -m simple_evals --eval=humaneval --model=gpt-5 --examples=10
 For reasoning models (GPT-5, GPT-5.1, o3, o4-mini, etc.), you can control the reasoning effort:
 
 ```bash
-# Minimal - Fastest execution, minimal reasoning
+# Fastest execution - Use 'minimal' for GPT-5, 'none' for GPT-5.1
 uv run python -m simple_evals --eval=mmlu --model=gpt-5 --reasoning-effort minimal --examples=10
+uv run python -m simple_evals --eval=mmlu --model=gpt-5.1 --reasoning-effort none --examples=10
 
 # Low - Fast execution with some reasoning (~3x speedup vs default)
 uv run python -m simple_evals --eval=mmlu --model=gpt-5 --reasoning-effort low --examples=10
@@ -149,8 +150,10 @@ uv run python -m simple_evals --eval=mmlu --model=gpt-5 --reasoning-effort high 
 **Performance Comparison (2 examples):**
 - Default (medium): ~40 seconds
 - `--reasoning-effort low`: ~13 seconds (3x faster)
-- `--reasoning-effort minimal`: ~5-8 seconds (fastest, 5-8x speedup)
+- `--reasoning-effort minimal/none`: ~5-8 seconds (fastest, 5-8x speedup)
 - Mini/Nano models default to low reasoning effort
+
+**Note:** GPT-5.1 uses `none` for the lowest effort, while GPT-5 uses `minimal`. Both provide the fastest execution.
 
 #### LLM-Graded Benchmarks (Require Grader)
 
