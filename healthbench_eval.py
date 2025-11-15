@@ -32,7 +32,7 @@ from .sampler.chat_completion_sampler import (
 )
 from .types_eval import Eval, EvalResult, MessageList, SamplerBase, SingleEvalResult
 
-INPUT_PATH = Path("simple-evals") / Path("Data") / "2025-05-07-06-14-12_oss_eval.jsonl"
+INPUT_PATH = Path(__file__).parent / "Data" / "2025-05-07-06-14-12_oss_eval.jsonl"
 INPUT_PATH_HARD = "https://openaipublic.blob.core.windows.net/simple-evals/healthbench/hard_2025-05-08-21-00-10.jsonl"
 INPUT_PATH_CONSENSUS = "https://openaipublic.blob.core.windows.net/simple-evals/healthbench/consensus_2025-05-09-20-00-46.jsonl"
 
