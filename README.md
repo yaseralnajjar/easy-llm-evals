@@ -89,6 +89,7 @@ uv run python -m simple_evals --list-models
 Supported models:
 - OpenAI: GPT-5, GPT-5.1, GPT-4.1, GPT-4o, GPT-4.5-preview, o1, o3, o4-mini, etc.
 - Claude: Claude Sonnet 4.5, Claude Haiku 4.5, Claude Opus 4.1
+- Google Gemini: Gemini 2.5 Pro, Gemini 2.5 Flash
 - Ollama: llama3.1, llama3.2, qwen, gemma3, etc.
 
 
@@ -181,6 +182,19 @@ uv run python -m simple_evals --eval=mmlu --model=claude-sonnet-4-5 --examples=1
 
 # With grader model
 uv run python -m simple_evals --eval=healthbench --model=claude-sonnet-4-5 --grader-model=claude-sonnet-4-5 --examples=10
+```
+
+#### With Google Gemini Models
+
+```bash
+# Gemini 2.5 Flash (fast and efficient)
+uv run python -m simple_evals --eval=mmlu --model=gemini-2.5-flash --examples=10
+
+# Gemini 2.5 Pro (most capable)
+uv run python -m simple_evals --eval=mmlu --model=gemini-2.5-pro --examples=10
+
+# With grader model
+uv run python -m simple_evals --eval=healthbench --model=gemini-2.5-pro --grader-model=gemini-2.5-pro --examples=10
 ```
 
 #### With Ollama Models (Requires Ollama Running)

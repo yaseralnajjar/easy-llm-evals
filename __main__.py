@@ -24,6 +24,7 @@ from .sampler.chat_completion_sampler import (
     ChatCompletionSampler,
 )
 from .sampler.claude_sampler import ClaudeCompletionSampler, CLAUDE_SYSTEM_MESSAGE_LMSYS
+from .sampler.gemini_sampler import GeminiSampler
 from .sampler.o_chat_completion_sampler import OChatCompletionSampler
 from .sampler.responses_sampler import ResponsesSampler
 from .sampler.ollama_sampler import OllamaSampler
@@ -299,6 +300,15 @@ def main():
         "claude-opus-4-1": lambda: ClaudeCompletionSampler(
             model="claude-opus-4-1-20250805",
             system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+        ),
+        # Google Gemini models
+        "gemini-2.5-pro": lambda: GeminiSampler(
+            model="gemini-2.5-pro",
+            max_tokens=2048,
+        ),
+        "gemini-2.5-flash": lambda: GeminiSampler(
+            model="gemini-2.5-flash",
+            max_tokens=2048,
         ),
     }
 
