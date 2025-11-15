@@ -88,7 +88,7 @@ uv run python -m simple_evals --list-models
 
 Supported models:
 - OpenAI: GPT-5, GPT-5.1, GPT-4.1, GPT-4o, GPT-4.5-preview, o1, o3, o4-mini, etc.
-- Claude: Claude Sonnet 4.5, Claude Haiku 4.5, Claude Opus 4.1, Claude 3.5 Sonnet (legacy), etc.
+- Claude: Claude Sonnet 4.5, Claude Haiku 4.5, Claude Opus 4.1
 - Ollama: llama3.1, llama3.2, qwen, gemma3, etc.
 
 
@@ -173,9 +173,6 @@ uv run python -m simple_evals --eval=healthbench_consensus --model=gpt-4o --grad
 #### With Claude Models
 
 ```bash
-# Set ANTHROPIC_API_KEY environment variable
-export ANTHROPIC_API_KEY=your-api-key
-
 uv run python -m simple_evals --eval=mmlu --model=claude-3-5-sonnet --examples=10
 uv run python -m simple_evals --eval=healthbench --model=claude-3-opus --grader-model=claude-3-opus --examples=10
 ```
