@@ -79,6 +79,12 @@ def main():
         default=None,
         help="Reasoning effort for reasoning models (none/minimal=fastest, low=faster, medium=balanced, high=best quality). GPT-5.1 uses 'none', GPT-5 uses 'minimal'. Applies to GPT-5, GPT-5.1, o3, o4-mini, etc.",
     )
+    parser.add_argument(
+        "--thinking-budget",
+        type=int,
+        default=None,
+        help="Thinking budget for Gemini models (0=disable, -1=dynamic, or specific token count). Disabled by default. Gemini 2.5 Pro: 128-32768, Flash: 0-24576. Higher values allow more reasoning.",
+    )
 
     args = parser.parse_args()
 
@@ -305,10 +311,12 @@ def main():
         "gemini-2.5-pro": lambda: GeminiSampler(
             model="gemini-2.5-pro",
             max_tokens=2048,
+            thinking_budget=args.thinking_budget,
         ),
         "gemini-2.5-flash": lambda: GeminiSampler(
             model="gemini-2.5-flash",
             max_tokens=2048,
+            thinking_budget=args.thinking_budget,
         ),
     }
 

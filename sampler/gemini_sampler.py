@@ -21,6 +21,7 @@ class GeminiSampler(SamplerBase):
         system_message: str | None = None,
         temperature: float = 0.5,
         max_tokens: int = 8192,
+        thinking_budget: int | None = None,
     ):
         load_dotenv()  # Load .env file
         self.api_key = os.environ.get("GEMINI_API_KEY")
@@ -32,6 +33,7 @@ class GeminiSampler(SamplerBase):
         self.system_message = system_message
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.thinking_budget = thinking_budget
 
     def _pack_message(self, role: str, content: Any) -> dict:
         """Convert message to Gemini format"""
@@ -85,6 +87,11 @@ class GeminiSampler(SamplerBase):
                     temperature=self.temperature,
                     max_output_tokens=self.max_tokens,
                 )
+                
+                # Add thinking config if thinking_budget is specified
+                if self.thinking_budget is not None:
+                    from google.genai.types import ThinkingConfig
+                    config.thinking_config = ThinkingConfig(thinking_budget=self.thinking_budget)
                 
                 response = self.client.models.generate_content(
                     model=self.model,

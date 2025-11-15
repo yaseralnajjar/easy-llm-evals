@@ -193,6 +193,11 @@ uv run python -m simple_evals --eval=mmlu --model=gemini-2.5-flash --examples=10
 # Gemini 2.5 Pro (most capable)
 uv run python -m simple_evals --eval=mmlu --model=gemini-2.5-pro --examples=10
 
+# With thinking budget (enable reasoning)
+# 0 = disable thinking, -1 = dynamic thinking, or specific token count
+# Pro: 128-32768, Flash: 0-24576
+uv run python -m simple_evals --eval=mmlu --model=gemini-2.5-pro --thinking-budget 1024 --examples=10
+
 # With grader model
 uv run python -m simple_evals --eval=healthbench --model=gemini-2.5-pro --grader-model=gemini-2.5-pro --examples=10
 ```
