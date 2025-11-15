@@ -1,0 +1,89 @@
+# Justfile for downloading benchmark datasets
+# Run `just download-all` to download all datasets
+
+# Create data directory if it doesn't exist
+_ensure-data-dir:
+    mkdir -p ../data
+
+# Download MMLU test data
+download-mmlu: _ensure-data-dir
+    @echo "Downloading MMLU test data..."
+    curl -L -o ../data/mmlu_test.csv https://openaipublic.blob.core.windows.net/simple-evals/mmlu_test.csv
+    @echo "MMLU data downloaded to data/mmlu_test.csv"
+
+# Download MATH test data
+download-math: _ensure-data-dir
+    @echo "Downloading MATH test data..."
+    curl -L -o ../data/math_test.csv https://openaipublic.blob.core.windows.net/simple-evals/math_test.csv
+    @echo "Downloading MATH-500 test data..."
+    curl -L -o ../data/math_500_test.csv https://openaipublic.blob.core.windows.net/simple-evals/math_500_test.csv
+    @echo "MATH data downloaded to data/"
+
+# Download GPQA diamond variant
+download-gpqa: _ensure-data-dir
+    @echo "Downloading GPQA diamond data..."
+    curl -L -o ../data/gpqa_diamond.csv https://openaipublic.blob.core.windows.net/simple-evals/gpqa_diamond.csv
+    @echo "GPQA data downloaded to data/gpqa_diamond.csv"
+
+# Download MGSM data
+download-mgsm: _ensure-data-dir
+    @echo "Downloading MGSM data..."
+    curl -L -o ../data/mgsm.csv https://openaipublic.blob.core.windows.net/simple-evals/mgsm.csv
+    @echo "MGSM data downloaded to data/mgsm.csv"
+
+# Download DROP data
+download-drop: _ensure-data-dir
+    @echo "Downloading DROP data..."
+    curl -L -o ../data/drop.jsonl https://openaipublic.blob.core.windows.net/simple-evals/drop.jsonl
+    @echo "DROP data downloaded to data/drop.jsonl"
+
+# Download SimpleQA data
+download-simpleqa: _ensure-data-dir
+    @echo "Downloading SimpleQA data..."
+    curl -L -o ../data/simpleqa.jsonl https://openaipublic.blob.core.windows.net/simple-evals/simpleqa.jsonl
+    @echo "SimpleQA data downloaded to data/simpleqa.jsonl"
+
+# Download BrowseComp data
+download-browsecomp: _ensure-data-dir
+    @echo "Downloading BrowseComp data..."
+    curl -L -o ../data/browsecomp.jsonl https://openaipublic.blob.core.windows.net/simple-evals/browsecomp.jsonl
+    @echo "BrowseComp data downloaded to data/browsecomp.jsonl"
+
+# Download HealthBench main dataset
+download-healthbench: _ensure-data-dir
+    @echo "Downloading HealthBench main dataset..."
+    curl -L -o ../data/2025-05-07-06-14-12_oss_eval.jsonl https://openaipublic.blob.core.windows.net/simple-evals/healthbench/2025-05-07-06-14-12_oss_eval.jsonl
+    @echo "HealthBench data downloaded to data/2025-05-07-06-14-12_oss_eval.jsonl"
+
+# Download HealthBench hard variant
+download-healthbench-hard: _ensure-data-dir
+    @echo "Downloading HealthBench hard variant..."
+    curl -L -o ../data/healthbench_hard.jsonl https://openaipublic.blob.core.windows.net/simple-evals/healthbench/hard_2025-05-08-21-00-10.jsonl
+    @echo "HealthBench hard data downloaded to data/healthbench_hard.jsonl"
+
+# Download HealthBench consensus variant
+download-healthbench-consensus: _ensure-data-dir
+    @echo "Downloading HealthBench consensus variant..."
+    curl -L -o ../data/healthbench_consensus.jsonl https://openaipublic.blob.core.windows.net/simple-evals/healthbench/consensus_2025-05-09-20-00-46.jsonl
+    @echo "HealthBench consensus data downloaded to data/healthbench_consensus.jsonl"
+
+# Download all datasets
+download-all: download-mmlu download-math download-gpqa download-mgsm download-drop download-simpleqa download-browsecomp download-healthbench download-healthbench-hard download-healthbench-consensus
+    @echo ""
+    @echo "✓ All datasets downloaded successfully to data/ directory"
+
+# List all available download commands
+list:
+    @echo "Available download commands:"
+    @echo "  just download-mmlu                   - Download MMLU test data"
+    @echo "  just download-math                   - Download MATH test data"
+    @echo "  just download-gpqa                   - Download GPQA diamond variant"
+    @echo "  just download-mgsm                   - Download MGSM data"
+    @echo "  just download-drop                   - Download DROP data"
+    @echo "  just download-simpleqa               - Download SimpleQA data"
+    @echo "  just download-browsecomp             - Download BrowseComp data"
+    @echo "  just download-healthbench            - Download HealthBench main dataset"
+    @echo "  just download-healthbench-hard       - Download HealthBench hard variant"
+    @echo "  just download-healthbench-consensus  - Download HealthBench consensus variant"
+    @echo "  just download-all                    - Download all datasets"
+
