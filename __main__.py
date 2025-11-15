@@ -7,14 +7,23 @@ import pandas as pd
 import os
 from . import common
 
+from .browsecomp_eval import BrowseCompEval
+from .drop_eval import DropEval
+from .gpqa_eval import GPQAEval
 from .healthbench_eval import HealthBenchEval
 from .healthbench_meta_eval import HealthBenchMetaEval
+from .humaneval_eval import HumanEval
+from .math_eval import MathEval
+from .mgsm_eval import MGSMEval
+from .mmlu_eval import MMLUEval
+from .simpleqa_eval import SimpleQAEval
 from .sampler.ensemble_grader_sampler import EnsembleGraderSampler
 from .sampler.chat_completion_sampler import (
     OPENAI_SYSTEM_MESSAGE_API,
     OPENAI_SYSTEM_MESSAGE_CHATGPT,
     ChatCompletionSampler,
 )
+from .sampler.claude_sampler import ClaudeCompletionSampler, CLAUDE_SYSTEM_MESSAGE_LMSYS
 from .sampler.o_chat_completion_sampler import OChatCompletionSampler
 from .sampler.responses_sampler import ResponsesSampler
 from .sampler.ollama_sampler import OllamaSampler
@@ -234,6 +243,23 @@ def main():
             model="gpt-4-turbo-2024-04-09",
             system_message=OPENAI_SYSTEM_MESSAGE_CHATGPT,
         ),
+        # Claude models
+        "claude-3-opus": lambda: ClaudeCompletionSampler(
+            model="claude-3-opus-20240229",
+            system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+        ),
+        "claude-3-5-sonnet": lambda: ClaudeCompletionSampler(
+            model="claude-3-5-sonnet-20241022",
+            system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+        ),
+        "claude-3-sonnet": lambda: ClaudeCompletionSampler(
+            model="claude-3-sonnet-20240229",
+            system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+        ),
+        "claude-3-haiku": lambda: ClaudeCompletionSampler(
+            model="claude-3-haiku-20240307",
+            system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+        ),
     }
 
     if args.list_models:
@@ -244,6 +270,14 @@ def main():
     
     if args.list_evals:
         print("Available evaluations:")
+        print(" - mmlu")
+        print(" - math (needs equality_checker)")
+        print(" - gpqa")
+        print(" - mgsm")
+        print(" - drop")
+        print(" - humaneval")
+        print(" - simpleqa (requires --grader-model)")
+        print(" - browsecomp (requires --grader-model)")
         print(" - healthbench (requires --grader-model)")
         print(" - healthbench_hard (requires --grader-model)")
         print(" - healthbench_consensus (requires --grader-model)")
@@ -289,6 +323,12 @@ def main():
         else:
             grading_sampler = EnsembleGraderSampler(grader_samplers)
             grader_label = "ensemble_" + "-".join(graders_chosen)
+    
+    # Create equality checker for math eval
+    equality_checker = lambda: ChatCompletionSampler(
+        model="gpt-4o-2024-11-20",
+        system_message=OPENAI_SYSTEM_MESSAGE_API,
+    )
 
     def get_evals(eval_name, debug_mode, grading_sampler):
         num_examples = (
@@ -296,6 +336,40 @@ def main():
         )
         # Set num_examples = None to reproduce full evals
         match eval_name:
+            case "mmlu":
+                return MMLUEval(num_examples=1 if debug_mode else num_examples)
+            case "math":
+                return MathEval(
+                    equality_checker=equality_checker(),
+                    num_examples=num_examples,
+                    n_repeats=1 if debug_mode else args.n_repeats or 10,
+                )
+            case "gpqa":
+                return GPQAEval(
+                    n_repeats=1 if debug_mode else args.n_repeats or 10,
+                    num_examples=num_examples,
+                )
+            case "mgsm":
+                return MGSMEval(
+                    num_examples_per_lang=10 if debug_mode else num_examples or 250
+                )
+            case "drop":
+                return DropEval(
+                    num_examples=10 if debug_mode else num_examples,
+                    train_samples_per_prompt=3,
+                )
+            case "humaneval":
+                return HumanEval(num_examples=10 if debug_mode else num_examples)
+            case "simpleqa":
+                return SimpleQAEval(
+                    grader_model=grading_sampler,
+                    num_examples=10 if debug_mode else num_examples,
+                )
+            case "browsecomp":
+                return BrowseCompEval(
+                    grader_model=grading_sampler,
+                    num_examples=10 if debug_mode else num_examples,
+                )
             case "healthbench":
                 return HealthBenchEval(
                     grader_model=grading_sampler,
@@ -338,21 +412,20 @@ def main():
             except Exception as e:
                 error_msg = str(e)
                 # Check if it's a known eval that's missing requirements
-                if eval_name in ["healthbench", "healthbench_hard", "healthbench_consensus"]:
+                if eval_name in ["healthbench", "healthbench_hard", "healthbench_consensus", "simpleqa", "browsecomp"]:
                     if grading_sampler is None:
                         print(f"Error: eval '{eval_name}' requires --grader-model to be specified.")
                         print(f"Example: --eval={eval_name} --model=gpt-4o --grader-model=gpt-4o")
                     elif "404" in error_msg or "ResourceNotFound" in error_msg or "No such file" in error_msg:
                         print(f"Error: The data file for '{eval_name}' is not available.")
-                        print(f"The HealthBench dataset may not be publicly available yet.")
-                        print(f"Please check https://openai.com/index/healthbench for more information.")
+                        print(f"Try downloading it first using: just download-{eval_name}")
                     else:
                         print(f"Error initializing eval '{eval_name}': {error_msg}")
                 elif eval_name == "healthbench_meta":
                     print(f"Error initializing eval '{eval_name}': {error_msg}")
                 else:
                     print(f"Error: eval '{eval_name}' not found.")
-                    print(f"Available evals: healthbench, healthbench_hard, healthbench_consensus, healthbench_meta")
+                    print(f"Available evals: mmlu, math, gpqa, mgsm, drop, humaneval, simpleqa, browsecomp, healthbench, healthbench_hard, healthbench_consensus, healthbench_meta")
                 return
     else:
         evals = {
