@@ -28,6 +28,9 @@ def main():
         "--list-models", action="store_true", help="List available models"
     )
     parser.add_argument(
+        "--list-evals", action="store_true", help="List available evaluations"
+    )
+    parser.add_argument(
         "--model",
         type=str,
         help="Select a model by name. Also accepts a comma-separated list of models.",
@@ -62,171 +65,172 @@ def main():
 
     args = parser.parse_args()
 
+    # Use lambda functions for lazy initialization to avoid API key checks when listing models
     available_models = {
         # Ollama Models
-        "qwen34b": OllamaSampler(model="qwen3:4b", max_tokens=2048),
-        "qwen38b": OllamaSampler(model="qwen3:8b", max_tokens=2048),
-        "llama3.2": OllamaSampler(model="llama3.2:1b", max_tokens=2048),
-        "llama3.1": OllamaSampler(model="llama3.1:8b", max_tokens=2048),
-        "gemma3": OllamaSampler(model="gemma3:latest", max_tokens=2048),
-        "gemma327b": OllamaSampler(model="gemma3:27b", max_tokens=2048),
-        "medgemma4b": OllamaSampler(model="alibayram/medgemma:4b", max_tokens=2048),
-        "medgemma27b": OllamaSampler(model="alibayram/medgemma:27b", max_tokens=2048),
+        "qwen34b": lambda: OllamaSampler(model="qwen3:4b", max_tokens=2048),
+        "qwen38b": lambda: OllamaSampler(model="qwen3:8b", max_tokens=2048),
+        "llama3.2": lambda: OllamaSampler(model="llama3.2:1b", max_tokens=2048),
+        "llama3.1": lambda: OllamaSampler(model="llama3.1:8b", max_tokens=2048),
+        "gemma3": lambda: OllamaSampler(model="gemma3:latest", max_tokens=2048),
+        "gemma327b": lambda: OllamaSampler(model="gemma3:27b", max_tokens=2048),
+        "medgemma4b": lambda: OllamaSampler(model="alibayram/medgemma:4b", max_tokens=2048),
+        "medgemma27b": lambda: OllamaSampler(model="alibayram/medgemma:27b", max_tokens=2048),
         # Reasoning Models
-        "o3": ResponsesSampler(
+        "o3": lambda: ResponsesSampler(
             model="o3-2025-04-16",
             reasoning_model=True,
         ),
-        "o3-temp-1": ResponsesSampler(
+        "o3-temp-1": lambda: ResponsesSampler(
             model="o3-2025-04-16",
             reasoning_model=True,
             temperature=1.0,
         ),
-        "o3_high": ResponsesSampler(
+        "o3_high": lambda: ResponsesSampler(
             model="o3-2025-04-16",
             reasoning_model=True,
             reasoning_effort="high",
         ),
-        "o3_low": ResponsesSampler(
+        "o3_low": lambda: ResponsesSampler(
             model="o3-2025-04-16",
             reasoning_model=True,
             reasoning_effort="low",
         ),
         # Default == Medium
-        "o4-mini": ResponsesSampler(
+        "o4-mini": lambda: ResponsesSampler(
             model="o4-mini-2025-04-16",
             reasoning_model=True,
         ),
-        "o4-mini_high": ResponsesSampler(
+        "o4-mini_high": lambda: ResponsesSampler(
             model="o4-mini-2025-04-16",
             reasoning_model=True,
             reasoning_effort="high",
         ),
-        "o4-mini_low": ResponsesSampler(
+        "o4-mini_low": lambda: ResponsesSampler(
             model="o4-mini-2025-04-16",
             reasoning_model=True,
             reasoning_effort="low",
         ),
-        "o1-pro": ResponsesSampler(
+        "o1-pro": lambda: ResponsesSampler(
             model="o1-pro",
             reasoning_model=True,
         ),
-        "o1": OChatCompletionSampler(
+        "o1": lambda: OChatCompletionSampler(
             model="o1",
         ),
-        "o1_high": OChatCompletionSampler(
+        "o1_high": lambda: OChatCompletionSampler(
             model="o1",
             reasoning_effort="high",
         ),
-        "o1_low": OChatCompletionSampler(
+        "o1_low": lambda: OChatCompletionSampler(
             model="o1",
             reasoning_effort="low",
         ),
-        "o1-preview": OChatCompletionSampler(
+        "o1-preview": lambda: OChatCompletionSampler(
             model="o1-preview",
         ),
-        "o1-mini": OChatCompletionSampler(
+        "o1-mini": lambda: OChatCompletionSampler(
             model="o1-mini",
         ),
         # Default == Medium
-        "o3-mini": OChatCompletionSampler(
+        "o3-mini": lambda: OChatCompletionSampler(
             model="o3-mini",
         ),
-        "o3-mini_high": OChatCompletionSampler(
+        "o3-mini_high": lambda: OChatCompletionSampler(
             model="o3-mini",
             reasoning_effort="high",
         ),
-        "o3-mini_low": OChatCompletionSampler(
+        "o3-mini_low": lambda: OChatCompletionSampler(
             model="o3-mini",
             reasoning_effort="low",
         ),
         # GPT-4.1 models
-        "gpt-4.1": ChatCompletionSampler(
+        "gpt-4.1": lambda: ChatCompletionSampler(
             model="gpt-4.1-2025-04-14",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
-        "gpt-4.1-temp-1": ChatCompletionSampler(
+        "gpt-4.1-temp-1": lambda: ChatCompletionSampler(
             model="gpt-4.1-2025-04-14",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
             temperature=1.0,
         ),
-        "gpt-4.1-mini": ChatCompletionSampler(
+        "gpt-4.1-mini": lambda: ChatCompletionSampler(
             model="gpt-4.1-mini-2025-04-14",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
-        "gpt-4.1-nano": ChatCompletionSampler(
+        "gpt-4.1-nano": lambda: ChatCompletionSampler(
             model="gpt-4.1-nano-2025-04-14",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
         # GPT-4o models
-        "gpt-4o": ChatCompletionSampler(
+        "gpt-4o": lambda: ChatCompletionSampler(
             model="gpt-4o",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
-        "gpt-4o-2024-11-20": ChatCompletionSampler(
+        "gpt-4o-2024-11-20": lambda: ChatCompletionSampler(
             model="gpt-4o-2024-11-20",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
-        "gpt-4o-2024-08-06": ChatCompletionSampler(
+        "gpt-4o-2024-08-06": lambda: ChatCompletionSampler(
             model="gpt-4o-2024-08-06",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
-        "gpt-4o-2024-08-06-temp-1": ChatCompletionSampler(
+        "gpt-4o-2024-08-06-temp-1": lambda: ChatCompletionSampler(
             model="gpt-4o-2024-08-06",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
             temperature=1.0,
         ),
-        "gpt-4o-2024-05-13": ChatCompletionSampler(
+        "gpt-4o-2024-05-13": lambda: ChatCompletionSampler(
             model="gpt-4o-2024-05-13",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
-        "gpt-4o-mini": ChatCompletionSampler(
+        "gpt-4o-mini": lambda: ChatCompletionSampler(
             model="gpt-4o-mini-2024-07-18",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
         # GPT-4.5 model
-        "gpt-4.5-preview": ChatCompletionSampler(
+        "gpt-4.5-preview": lambda: ChatCompletionSampler(
             model="gpt-4.5-preview-2025-02-27",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
         # GPT-4-turbo model
-        "gpt-4-turbo-2024-04-09": ChatCompletionSampler(
+        "gpt-4-turbo-2024-04-09": lambda: ChatCompletionSampler(
             model="gpt-4-turbo-2024-04-09",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
         ),
         # GPT-4 model
-        "gpt-4-0613": ChatCompletionSampler(
+        "gpt-4-0613": lambda: ChatCompletionSampler(
             model="gpt-4-0613",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
         ),
         # GPT-3.5 Turbo model
-        "gpt-3.5-turbo-0125": ChatCompletionSampler(
+        "gpt-3.5-turbo-0125": lambda: ChatCompletionSampler(
             model="gpt-3.5-turbo-0125",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
         ),
-        "gpt-3.5-turbo-0125-temp-1": ChatCompletionSampler(
+        "gpt-3.5-turbo-0125-temp-1": lambda: ChatCompletionSampler(
             model="gpt-3.5-turbo-0125",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             temperature=1.0,
         ),
         # Chatgpt models:
-        "chatgpt-4o-latest": ChatCompletionSampler(
+        "chatgpt-4o-latest": lambda: ChatCompletionSampler(
             model="chatgpt-4o-latest",
             system_message=OPENAI_SYSTEM_MESSAGE_CHATGPT,
             max_tokens=2048,
         ),
-        "gpt-4-turbo-2024-04-09_chatgpt": ChatCompletionSampler(
+        "gpt-4-turbo-2024-04-09_chatgpt": lambda: ChatCompletionSampler(
             model="gpt-4-turbo-2024-04-09",
             system_message=OPENAI_SYSTEM_MESSAGE_CHATGPT,
         ),
@@ -236,6 +240,14 @@ def main():
         print("Available models:")
         for model_name in available_models.keys():
             print(f" - {model_name}")
+        return
+    
+    if args.list_evals:
+        print("Available evaluations:")
+        print(" - healthbench (requires --grader-model)")
+        print(" - healthbench_hard (requires --grader-model)")
+        print(" - healthbench_consensus (requires --grader-model)")
+        print(" - healthbench_meta")
         return
 
     if args.model:
@@ -247,17 +259,17 @@ def main():
 
         if args.eval == "healthbench_meta":
             if len(models_chosen) == 1:
-                models = {model_name: available_models[models_chosen[0]]}
+                models = {model_name: available_models[models_chosen[0]]()}
             else:
                 models_list = [
-                    available_models[model_name] for model_name in models_chosen
+                    available_models[model_name]() for model_name in models_chosen
                 ]
                 ensemble_sampler = EnsembleGraderSampler(models_list)
                 ensemble_name = "-".join(models_chosen)
                 models = {ensemble_name: ensemble_sampler}
         else:
             models = {
-                model_name: available_models[model_name] for model_name in models_chosen
+                model_name: available_models[model_name]() for model_name in models_chosen
             }
 
     print(f"Running with args {args}")
@@ -270,7 +282,7 @@ def main():
             print(f"Error: Grader model(s) {invalid} not found.")
             return
 
-        grader_samplers = [available_models[g] for g in graders_chosen]
+        grader_samplers = [available_models[g]() for g in graders_chosen]
         if len(grader_samplers) == 1:
             grading_sampler = grader_samplers[0]
             grader_label = graders_chosen[0]
@@ -323,8 +335,24 @@ def main():
         for eval_name in evals_list:
             try:
                 evals[eval_name] = get_evals(eval_name, args.debug, grading_sampler)
-            except Exception:
-                print(f"Error: eval '{eval_name}' not found.")
+            except Exception as e:
+                error_msg = str(e)
+                # Check if it's a known eval that's missing requirements
+                if eval_name in ["healthbench", "healthbench_hard", "healthbench_consensus"]:
+                    if grading_sampler is None:
+                        print(f"Error: eval '{eval_name}' requires --grader-model to be specified.")
+                        print(f"Example: --eval={eval_name} --model=gpt-4o --grader-model=gpt-4o")
+                    elif "404" in error_msg or "ResourceNotFound" in error_msg or "No such file" in error_msg:
+                        print(f"Error: The data file for '{eval_name}' is not available.")
+                        print(f"The HealthBench dataset may not be publicly available yet.")
+                        print(f"Please check https://openai.com/index/healthbench for more information.")
+                    else:
+                        print(f"Error initializing eval '{eval_name}': {error_msg}")
+                elif eval_name == "healthbench_meta":
+                    print(f"Error initializing eval '{eval_name}': {error_msg}")
+                else:
+                    print(f"Error: eval '{eval_name}' not found.")
+                    print(f"Available evals: healthbench, healthbench_hard, healthbench_consensus, healthbench_meta")
                 return
     else:
         evals = {
