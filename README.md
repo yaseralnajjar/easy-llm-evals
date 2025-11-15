@@ -2,6 +2,8 @@
 
 A lightweight library for evaluating language models across multiple benchmarks including MMLU, MATH, GPQA, MGSM, DROP, HumanEval, SimpleQA, BrowseComp, and HealthBench.
 
+It's forked from both OpenAI's simple-evals and kayzi0's simple-evals: https://github.com/openai/simple-evals and https://github.com/kayzi0/simple-evals
+
 ## Overview
 
 This repository contains implementations of various evaluation benchmarks for language models, with support for both OpenAI, Claude, and local Ollama models.
