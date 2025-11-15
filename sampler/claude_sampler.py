@@ -2,6 +2,7 @@ import time
 import os
 
 import anthropic
+from dotenv import load_dotenv
 
 from ..types_eval import MessageList, SamplerBase, SamplerResponse
 from .. import common
@@ -32,6 +33,7 @@ class ClaudeCompletionSampler(SamplerBase):
         temperature: float = 0.0,  # default in Anthropic example
         max_tokens: int = 4096,
     ):
+        load_dotenv()  # Load .env file
         self.client = anthropic.Anthropic()
         self.api_key = os.environ.get("ANTHROPIC_API_KEY")  # please set your API_KEY
         self.model = model
