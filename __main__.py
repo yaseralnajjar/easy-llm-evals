@@ -71,6 +71,13 @@ def main():
     parser.add_argument(
         "--examples", type=int, help="Number of examples to use (overrides default)"
     )
+    parser.add_argument(
+        "--reasoning-effort",
+        type=str,
+        choices=["low", "medium", "high"],
+        default=None,
+        help="Reasoning effort for reasoning models (low=faster, high=better quality). Applies to GPT-5, GPT-5.1, o3, o4-mini, etc.",
+    )
 
     args = parser.parse_args()
 
@@ -157,31 +164,38 @@ def main():
         "gpt-5": lambda: ResponsesSampler(
             model="gpt-5",
             reasoning_model=True,
+            reasoning_effort=args.reasoning_effort,
         ),
         "gpt-5-2025-02-27": lambda: ResponsesSampler(
             model="gpt-5-2025-02-27",
             reasoning_model=True,
+            reasoning_effort=args.reasoning_effort,
         ),
         "gpt-5-pro": lambda: ResponsesSampler(
             model="gpt-5-pro",
             reasoning_model=True,
+            reasoning_effort=args.reasoning_effort,
         ),
         "gpt-5-mini": lambda: ResponsesSampler(
             model="gpt-5-mini",
             reasoning_model=True,
+            reasoning_effort=args.reasoning_effort or "low",  # Default to low for mini
         ),
         "gpt-5-nano": lambda: ResponsesSampler(
             model="gpt-5-nano",
             reasoning_model=True,
+            reasoning_effort=args.reasoning_effort or "low",  # Default to low for nano
         ),
         # GPT-5.1 models - All GPT-5.1 models are reasoning models
         "gpt-5.1": lambda: ResponsesSampler(
             model="gpt-5.1",
             reasoning_model=True,
+            reasoning_effort=args.reasoning_effort,
         ),
         "gpt-5.1-2025-04-14": lambda: ResponsesSampler(
             model="gpt-5.1-2025-04-14",
             reasoning_model=True,
+            reasoning_effort=args.reasoning_effort,
         ),
         # GPT-4.1 models
         "gpt-4.1": lambda: ChatCompletionSampler(
