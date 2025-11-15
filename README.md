@@ -88,9 +88,18 @@ uv run python -m simple_evals --list-models
 ```
 
 Supported models:
-- OpenAI: GPT-4.1, GPT-4o, GPT-4.5-preview, o1, o3, o4-mini, etc.
+- OpenAI: GPT-5, GPT-5.1, GPT-4.1, GPT-4o, GPT-4.5-preview, o1, o3, o4-mini, etc.
 - Claude: Claude 3 Opus, Claude 3.5 Sonnet, Claude 3 Sonnet, Claude 3 Haiku
 - Ollama: llama3.1, llama3.2, qwen, gemma3, etc.
+
+**New: GPT-5 Models**
+- `gpt-5` - Latest GPT-5 base model (4096 tokens)
+- `gpt-5-pro` - Enhanced reasoning and better answers
+- `gpt-5-mini` - Faster, more efficient variant
+- `gpt-5-nano` - Fastest, most cost-effective
+- `gpt-5.1` - Latest GPT-5.1 base model
+- `gpt-5.1-mini` - GPT-5.1 efficient variant
+- `gpt-5.1-nano` - GPT-5.1 fastest variant
 
 ### List Available Evaluations
 
@@ -103,23 +112,26 @@ uv run python -m simple_evals --list-evals
 #### Standard Benchmarks (No Grader)
 
 ```bash
-# MMLU
+# MMLU with GPT-5
+uv run python -m simple_evals --eval=mmlu --model=gpt-5 --examples=10
+
+# MMLU with GPT-4o
 uv run python -m simple_evals --eval=mmlu --model=gpt-4o --examples=10
 
 # MATH
-uv run python -m simple_evals --eval=math --model=gpt-4o --examples=10
+uv run python -m simple_evals --eval=math --model=gpt-5 --examples=10
 
 # GPQA
-uv run python -m simple_evals --eval=gpqa --model=gpt-4o --examples=10
+uv run python -m simple_evals --eval=gpqa --model=gpt-5-pro --examples=10
 
 # MGSM
-uv run python -m simple_evals --eval=mgsm --model=gpt-4o --examples=10
+uv run python -m simple_evals --eval=mgsm --model=gpt-5.1 --examples=10
 
 # DROP
-uv run python -m simple_evals --eval=drop --model=gpt-4o --examples=10
+uv run python -m simple_evals --eval=drop --model=gpt-5-mini --examples=10
 
 # HumanEval
-uv run python -m simple_evals --eval=humaneval --model=gpt-4o --examples=10
+uv run python -m simple_evals --eval=humaneval --model=gpt-5 --examples=10
 ```
 
 #### LLM-Graded Benchmarks (Require Grader)

@@ -213,6 +213,53 @@ def main():
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
         ),
+        # GPT-5 models
+        "gpt-5": lambda: ChatCompletionSampler(
+            model="gpt-5",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
+        "gpt-5-2025-02-27": lambda: ChatCompletionSampler(
+            model="gpt-5-2025-02-27",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
+        "gpt-5-pro": lambda: ChatCompletionSampler(
+            model="gpt-5-pro",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
+        "gpt-5-mini": lambda: ChatCompletionSampler(
+            model="gpt-5-mini",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
+        "gpt-5-nano": lambda: ChatCompletionSampler(
+            model="gpt-5-nano",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
+        # GPT-5.1 models
+        "gpt-5.1": lambda: ChatCompletionSampler(
+            model="gpt-5.1",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
+        "gpt-5.1-2025-04-14": lambda: ChatCompletionSampler(
+            model="gpt-5.1-2025-04-14",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
+        "gpt-5.1-mini": lambda: ChatCompletionSampler(
+            model="gpt-5.1-mini",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
+        "gpt-5.1-nano": lambda: ChatCompletionSampler(
+            model="gpt-5.1-nano",
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=4096,
+        ),
         # GPT-4-turbo model
         "gpt-4-turbo-2024-04-09": lambda: ChatCompletionSampler(
             model="gpt-4-turbo-2024-04-09",
