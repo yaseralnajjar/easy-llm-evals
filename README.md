@@ -173,8 +173,14 @@ uv run python -m simple_evals --eval=healthbench_consensus --model=gpt-4o --grad
 #### With Claude Models
 
 ```bash
-uv run python -m simple_evals --eval=mmlu --model=claude-3-5-sonnet --examples=10
-uv run python -m simple_evals --eval=healthbench --model=claude-3-opus --grader-model=claude-3-opus --examples=10
+# Claude Haiku 4.5 (fastest and cheapest)
+uv run python -m simple_evals --eval=mmlu --model=claude-haiku-4-5 --examples=10
+
+# Claude Sonnet 4.5 (best for complex tasks)
+uv run python -m simple_evals --eval=mmlu --model=claude-sonnet-4-5 --examples=10
+
+# With grader model
+uv run python -m simple_evals --eval=healthbench --model=claude-sonnet-4-5 --grader-model=claude-sonnet-4-5 --examples=10
 ```
 
 #### With Ollama Models (Requires Ollama Running)
@@ -192,10 +198,10 @@ uv run python -m simple_evals --eval=healthbench --model=llama3.1 --grader-model
 
 ```bash
 # Evaluate multiple models
-uv run python -m simple_evals --eval=mmlu --model=gpt-4o,claude-3-5-sonnet --examples=10
+uv run python -m simple_evals --eval=mmlu --model=gpt-4o,claude-sonnet-4-5 --examples=10
 
 # Use ensemble grading
-uv run python -m simple_evals --eval=healthbench --model=gpt-4o --grader-model=gpt-4o,claude-3-opus --examples=10
+uv run python -m simple_evals --eval=healthbench --model=gpt-4o --grader-model=gpt-4o,claude-opus-4-1 --examples=10
 ```
 
 ### Debug Mode
