@@ -24,13 +24,22 @@ class ChatCompletionSampler(SamplerBase):
         system_message: str | None = None,
         temperature: float = 0.5,
         max_tokens: int = 1024,
+        base_url: str | None = None,
+        api_key: str | None = None,
+        model_override: str | None = None,
     ):
         super().__init__()
         self.api_key_name = "OPENAI_API_KEY"
         load_dotenv()
-        self.client = OpenAI()
+        # Allow custom base_url and api_key for OpenAI-compatible endpoints
+        client_kwargs = {}
+        if base_url:
+            client_kwargs["base_url"] = base_url
+        if api_key:
+            client_kwargs["api_key"] = api_key
+        self.client = OpenAI(**client_kwargs)
         # using api_key=os.environ.get("OPENAI_API_KEY")  # please set your API_KEY
-        self.model = model
+        self.model = model_override if model_override else model
         self.system_message = system_message
         self.temperature = temperature
         self.max_tokens = max_tokens

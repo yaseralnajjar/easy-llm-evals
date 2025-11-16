@@ -252,6 +252,108 @@ uv run python -m simple_evals --eval=mmlu --model=llama3.1 --examples=10
 uv run python -m simple_evals --eval=healthbench --model=llama3.1 --grader-model=llama3.1 --examples=10
 ```
 
+### Using OpenAI-Compatible Endpoints
+
+You can run evaluations against any OpenAI-compatible API endpoint using `--openai-base-url`. This allows you to use local models via Ollama or vLLM, or alternative providers like OpenRouter.
+
+#### With Ollama (OpenAI-Compatible Endpoint)
+
+Ollama provides an OpenAI-compatible API that can be used with any OpenAI model configuration:
+
+```bash
+# Start Ollama
+ollama serve
+
+# Pull a model
+ollama pull llama3.2
+
+# Run eval using OpenAI-compatible endpoint
+# Note: You'll need to set OPENAI_API_KEY to any value (it's required but ignored by Ollama)
+export OPENAI_API_KEY=ollama
+
+# Option 1: Use --model-override to specify the exact model name for your endpoint
+uv run python -m simple_evals \
+  --eval=mmlu \
+  --model=gpt-4o \
+  --openai-base-url=http://localhost:11434/v1/ \
+  --model-override=llama3.2 \
+  --examples=10
+
+# Option 2: If your endpoint accepts any model name, you can use a predefined model key
+uv run python -m simple_evals \
+  --eval=mmlu \
+  --model=gpt-4o \
+  --openai-base-url=http://localhost:11434/v1/ \
+  --examples=10
+```
+
+**Reference:** [Ollama OpenAI Compatibility](https://docs.ollama.com/api/openai-compatibility)
+
+#### With vLLM (OpenAI-Compatible Server)
+
+vLLM provides an OpenAI-compatible server for running local models at high performance:
+
+```bash
+# Start vLLM server (example with Llama 3.2)
+python -m vllm.entrypoints.openai.api_server \
+  --model meta-llama/Llama-3.2-3B-Instruct \
+  --port 8000
+
+uv run python -m simple_evals \
+  --eval=mmlu \
+  --model=gpt-4o \
+  --openai-base-url=http://localhost:8000/v1 \
+  --model-override=meta-llama/Llama-3.2-3B-Instruct \
+  --examples=10
+```
+
+**References:**
+- [vLLM OpenAI Chat Completion Client](https://docs.vllm.ai/en/stable/examples/online_serving/openai_chat_completion_client.html)
+- [vLLM Quickstart: OpenAI-Compatible Server](https://docs.vllm.ai/en/stable/getting_started/quickstart.html#openai-compatible-server)
+
+#### With OpenRouter
+
+OpenRouter provides access to multiple LLM providers through a unified OpenAI-compatible API:
+
+```bash
+uv run python -m simple_evals \
+  --eval=mmlu \
+  --model=gpt-4o \
+  --use-openrouter \
+  --examples=10
+
+# Use --model-override to specify OpenRouter-specific models
+uv run python -m simple_evals \
+  --eval=mmlu \
+  --model=gpt-4o \
+  --use-openrouter \
+  --model-override=deepseek/deepseek-chat \
+  --examples=10
+```
+
+**Note:** Check [OpenRouter's model list](https://openrouter.ai/models) for available models and their exact names.
+
+#### With Custom Docker/Local Endpoints
+
+For custom OpenAI-compatible endpoints (like Docker containers), use both flags together:
+
+```bash
+# Example: Custom Docker model at localhost:12434
+export OPENAI_API_KEY=dummy
+
+uv run python -m simple_evals \
+  --eval=mmlu \
+  --model=gpt-4o \
+  --openai-base-url=http://localhost:12434/engines/llama.cpp/v1/ \
+  --model-override=ai/gemma3 \
+  --examples=10
+```
+
+**Key Points:**
+- `--openai-base-url`: Sets the API endpoint URL
+- `--model-override`: Specifies the exact model name your endpoint expects
+- `--model`: Selects which evaluation configuration to use (gpt-4o, gpt-4.1, etc.)
+
 ### Multiple Models
 
 ```bash

@@ -85,8 +85,41 @@ def main():
         default=None,
         help="Thinking budget for Claude and Gemini models (token count). Disabled by default. Claude: min 1024, suggested 1k-32k. Gemini 2.5 Pro: 128-32768, Flash: 0-24576. Higher values allow more reasoning.",
     )
+    parser.add_argument(
+        "--openai-base-url",
+        type=str,
+        default=None,
+        help="Custom base URL for OpenAI-compatible API (e.g., http://localhost:11434/v1/ for Ollama, or vLLM server URL). When set, all OpenAI samplers will use this endpoint.",
+    )
+    parser.add_argument(
+        "--use-openrouter",
+        action="store_true",
+        help="Use OpenRouter API (https://openrouter.ai/api/v1) with OPENROUTER_API_KEY environment variable.",
+    )
+    parser.add_argument(
+        "--model-override",
+        type=str,
+        default=None,
+        help="Override the model name sent to the API (useful for custom endpoints). Example: --model-override=ai/gemma3",
+    )
 
     args = parser.parse_args()
+
+    # Determine base_url and api_key for OpenAI-compatible endpoints
+    openai_base_url = None
+    openai_api_key = None
+    openai_model_override = args.model_override
+    
+    if args.use_openrouter:
+        openai_base_url = "https://openrouter.ai/api/v1"
+        openai_api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not openai_api_key:
+            print("Error: --use-openrouter requires OPENROUTER_API_KEY environment variable")
+            return
+    elif args.openai_base_url:
+        openai_base_url = args.openai_base_url
+        # When using custom base_url, api_key might still come from OPENAI_API_KEY or can be dummy
+        openai_api_key = None  # Will use default from environment
 
     # Use lambda functions for lazy initialization to avoid API key checks when listing models
     available_models = {
@@ -103,196 +136,316 @@ def main():
         "o3": lambda: ResponsesSampler(
             model="o3-2025-04-16",
             reasoning_model=True,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o3-temp-1": lambda: ResponsesSampler(
             model="o3-2025-04-16",
             reasoning_model=True,
             temperature=1.0,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o3_high": lambda: ResponsesSampler(
             model="o3-2025-04-16",
             reasoning_model=True,
             reasoning_effort="high",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o3_low": lambda: ResponsesSampler(
             model="o3-2025-04-16",
             reasoning_model=True,
             reasoning_effort="low",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # Default == Medium
         "o4-mini": lambda: ResponsesSampler(
             model="o4-mini-2025-04-16",
             reasoning_model=True,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o4-mini_high": lambda: ResponsesSampler(
             model="o4-mini-2025-04-16",
             reasoning_model=True,
             reasoning_effort="high",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o4-mini_low": lambda: ResponsesSampler(
             model="o4-mini-2025-04-16",
             reasoning_model=True,
             reasoning_effort="low",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o1-pro": lambda: ResponsesSampler(
             model="o1-pro",
             reasoning_model=True,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o1": lambda: OChatCompletionSampler(
             model="o1",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o1_high": lambda: OChatCompletionSampler(
             model="o1",
             reasoning_effort="high",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o1_low": lambda: OChatCompletionSampler(
             model="o1",
             reasoning_effort="low",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o1-preview": lambda: OChatCompletionSampler(
             model="o1-preview",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o1-mini": lambda: OChatCompletionSampler(
             model="o1-mini",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # Default == Medium
         "o3-mini": lambda: OChatCompletionSampler(
             model="o3-mini",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o3-mini_high": lambda: OChatCompletionSampler(
             model="o3-mini",
             reasoning_effort="high",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "o3-mini_low": lambda: OChatCompletionSampler(
             model="o3-mini",
             reasoning_effort="low",
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # GPT-5 models - All GPT-5 models are reasoning models using ResponsesSampler
         "gpt-5": lambda: ResponsesSampler(
             model="gpt-5",
             reasoning_model=True,
             reasoning_effort=args.reasoning_effort,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-5-2025-02-27": lambda: ResponsesSampler(
             model="gpt-5-2025-02-27",
             reasoning_model=True,
             reasoning_effort=args.reasoning_effort,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-5-pro": lambda: ResponsesSampler(
             model="gpt-5-pro",
             reasoning_model=True,
             reasoning_effort=args.reasoning_effort,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-5-mini": lambda: ResponsesSampler(
             model="gpt-5-mini",
             reasoning_model=True,
             reasoning_effort=args.reasoning_effort or "low",  # Default to low for mini
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-5-nano": lambda: ResponsesSampler(
             model="gpt-5-nano",
             reasoning_model=True,
             reasoning_effort=args.reasoning_effort or "low",  # Default to low for nano
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # GPT-5.1 models - All GPT-5.1 models are reasoning models
         "gpt-5.1": lambda: ResponsesSampler(
             model="gpt-5.1",
             reasoning_model=True,
             reasoning_effort=args.reasoning_effort,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-5.1-2025-04-14": lambda: ResponsesSampler(
             model="gpt-5.1-2025-04-14",
             reasoning_model=True,
             reasoning_effort=args.reasoning_effort,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # GPT-4.1 models
         "gpt-4.1": lambda: ChatCompletionSampler(
             model="gpt-4.1-2025-04-14",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4.1-temp-1": lambda: ChatCompletionSampler(
             model="gpt-4.1-2025-04-14",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
             temperature=1.0,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4.1-mini": lambda: ChatCompletionSampler(
             model="gpt-4.1-mini-2025-04-14",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4.1-nano": lambda: ChatCompletionSampler(
             model="gpt-4.1-nano-2025-04-14",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # GPT-4o models
         "gpt-4o": lambda: ChatCompletionSampler(
             model="gpt-4o",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4o-2024-11-20": lambda: ChatCompletionSampler(
             model="gpt-4o-2024-11-20",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4o-2024-08-06": lambda: ChatCompletionSampler(
             model="gpt-4o-2024-08-06",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4o-2024-08-06-temp-1": lambda: ChatCompletionSampler(
             model="gpt-4o-2024-08-06",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
             temperature=1.0,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4o-2024-05-13": lambda: ChatCompletionSampler(
             model="gpt-4o-2024-05-13",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4o-mini": lambda: ChatCompletionSampler(
             model="gpt-4o-mini-2024-07-18",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # GPT-4.5 model
         "gpt-4.5-preview": lambda: ChatCompletionSampler(
             model="gpt-4.5-preview-2025-02-27",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # GPT-4-turbo model
         "gpt-4-turbo-2024-04-09": lambda: ChatCompletionSampler(
             model="gpt-4-turbo-2024-04-09",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # GPT-4 model
         "gpt-4-0613": lambda: ChatCompletionSampler(
             model="gpt-4-0613",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # GPT-3.5 Turbo model
         "gpt-3.5-turbo-0125": lambda: ChatCompletionSampler(
             model="gpt-3.5-turbo-0125",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-3.5-turbo-0125-temp-1": lambda: ChatCompletionSampler(
             model="gpt-3.5-turbo-0125",
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             temperature=1.0,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # Chatgpt models:
         "chatgpt-4o-latest": lambda: ChatCompletionSampler(
             model="chatgpt-4o-latest",
             system_message=OPENAI_SYSTEM_MESSAGE_CHATGPT,
             max_tokens=2048,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         "gpt-4-turbo-2024-04-09_chatgpt": lambda: ChatCompletionSampler(
             model="gpt-4-turbo-2024-04-09",
             system_message=OPENAI_SYSTEM_MESSAGE_CHATGPT,
+            base_url=openai_base_url,
+            api_key=openai_api_key,
+            model_override=openai_model_override,
         ),
         # Claude models - Claude 4.1+ only
         "claude-sonnet-4-5": lambda: ClaudeCompletionSampler(
@@ -389,6 +542,9 @@ def main():
     equality_checker = lambda: ChatCompletionSampler(
         model="gpt-4o-2024-11-20",
         system_message=OPENAI_SYSTEM_MESSAGE_API,
+        base_url=openai_base_url,
+        api_key=openai_api_key,
+        model_override=openai_model_override,
     )
 
     def get_evals(eval_name, debug_mode, grading_sampler):
