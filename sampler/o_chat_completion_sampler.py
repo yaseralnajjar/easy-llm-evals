@@ -18,6 +18,7 @@ class OChatCompletionSampler(SamplerBase):
         reasoning_effort: str | None = None,
         model: str = "o1-mini",
     ):
+        super().__init__()
         self.api_key_name = "OPENAI_API_KEY"
         self.client = OpenAI()
         # using api_key=os.environ.get("OPENAI_API_KEY")  # please set your API_KEY
@@ -50,12 +51,18 @@ class OChatCompletionSampler(SamplerBase):
         trial = 0
         while True:
             try:
+                start_time = time.perf_counter()
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=message_list,
                     reasoning_effort=self.reasoning_effort,
                 )
+                duration_ms = (time.perf_counter() - start_time) * 1000.0
                 content = response.choices[0].message.content
+                
+                # Record speed stats
+                self.speed_stats.record_request(duration_ms, len(content))
+                
                 return SamplerResponse(
                     response_text=content,
                     response_metadata={"usage": response.usage},

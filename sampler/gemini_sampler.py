@@ -23,6 +23,7 @@ class GeminiSampler(SamplerBase):
         max_tokens: int = 8192,
         thinking_budget: int | None = None,
     ):
+        super().__init__()
         load_dotenv()  # Load .env file
         self.api_key = os.environ.get("GEMINI_API_KEY")
         if not self.api_key:
@@ -93,17 +94,22 @@ class GeminiSampler(SamplerBase):
                     from google.genai.types import ThinkingConfig
                     config.thinking_config = ThinkingConfig(thinking_budget=self.thinking_budget)
                 
+                start_time = time.perf_counter()
                 response = self.client.models.generate_content(
                     model=self.model,
                     contents=contents,
                     config=config,
                 )
+                duration_ms = (time.perf_counter() - start_time) * 1000.0
                 
                 # Extract text from response
                 if response.candidates and len(response.candidates) > 0:
                     candidate = response.candidates[0]
                     if candidate.content and candidate.content.parts:
                         text = candidate.content.parts[0].text
+                        
+                        # Record speed stats
+                        self.speed_stats.record_request(duration_ms, len(text))
                         
                         # Ensure message_list has proper format for reporting
                         formatted_message_list = []

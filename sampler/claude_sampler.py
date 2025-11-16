@@ -33,6 +33,7 @@ class ClaudeCompletionSampler(SamplerBase):
         temperature: float = 0.0,  # default in Anthropic example
         max_tokens: int = 4096,
     ):
+        super().__init__()
         load_dotenv()  # Load .env file
         self.client = anthropic.Anthropic()
         self.api_key = os.environ.get("ANTHROPIC_API_KEY")  # please set your API_KEY
@@ -71,6 +72,8 @@ class ClaudeCompletionSampler(SamplerBase):
             try:
                 if not common.has_only_user_assistant_messages(message_list):
                     raise ValueError(f"Claude sampler only supports user and assistant messages, got {message_list}")
+                
+                start_time = time.perf_counter()
                 if self.system_message:
                     response_message = self.client.messages.create(
                         model=self.model,
@@ -88,7 +91,12 @@ class ClaudeCompletionSampler(SamplerBase):
                         messages=message_list,
                     )
                     claude_input_messages = message_list
+                duration_ms = (time.perf_counter() - start_time) * 1000.0
                 response_text = response_message.content[0].text
+                
+                # Record speed stats
+                self.speed_stats.record_request(duration_ms, len(response_text))
+                
                 return SamplerResponse(
                     response_text=response_text,
                     response_metadata={},

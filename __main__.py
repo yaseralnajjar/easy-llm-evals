@@ -571,6 +571,36 @@ def main():
     )
     print("\nAll results: ")
     print(merge_metrics_df.to_markdown())
+    
+    # Collect speed metrics from samplers
+    speed_metrics = []
+    for model_name, sampler in models.items():
+        stats = sampler.speed_stats
+        if stats.num_requests > 0:
+            # Format model_name with timestamp to match results table
+            for eval_model_name in mergekey2resultpath.keys():
+                if eval_model_name.startswith(f"{list(evals.keys())[0]}_{model_name}_"):
+                    # Extract the full model name with timestamp from result filename
+                    display_model_name = "_".join(eval_model_name.split("_")[1:])
+                    speed_metrics.append({
+                        "model_name": display_model_name,
+                        "number_of_requests": stats.num_requests,
+                        "tps": round(stats.get_average_tps(), 2)
+                    })
+                    break
+            else:
+                # Fallback if we can't find a match
+                speed_metrics.append({
+                    "model_name": model_name,
+                    "number_of_requests": stats.num_requests,
+                    "tps": round(stats.get_average_tps(), 2)
+                })
+    
+    if speed_metrics:
+        speed_df = pd.DataFrame(speed_metrics)
+        print("\nSpeed results:")
+        print(speed_df.to_markdown(index=False))
+    
     return merge_metrics
 
 

@@ -18,6 +18,7 @@ class EnsembleGraderSampler(SamplerBase):
     """
 
     def __init__(self, graders: list[SamplerBase]):
+        super().__init__()
         self.graders = graders
 
     def __call__(self, message_list: MessageList) -> SamplerResponse:

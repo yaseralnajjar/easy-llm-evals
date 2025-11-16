@@ -21,6 +21,7 @@ class ResponsesSampler(SamplerBase):
         reasoning_model: bool = False,
         reasoning_effort: str | None = None,
     ):
+        super().__init__()
         self.api_key_name = "OPENAI_API_KEY"
         load_dotenv()
         assert os.environ.get("OPENAI_API_KEY"), "Please set OPENAI_API_KEY"
@@ -60,6 +61,7 @@ class ResponsesSampler(SamplerBase):
         trial = 0
         while True:
             try:
+                start_time = time.perf_counter()
                 if self.reasoning_model:
                     reasoning = (
                         {"effort": self.reasoning_effort}
@@ -78,8 +80,14 @@ class ResponsesSampler(SamplerBase):
                         temperature=self.temperature,
                         max_output_tokens=self.max_tokens,
                     )
+                duration_ms = (time.perf_counter() - start_time) * 1000.0
+                response_text = response.output_text
+                
+                # Record speed stats
+                self.speed_stats.record_request(duration_ms, len(response_text))
+                
                 return SamplerResponse(
-                    response_text=response.output_text,
+                    response_text=response_text,
                     response_metadata={"usage": response.usage},
                     actual_queried_message_list=message_list,
                 )

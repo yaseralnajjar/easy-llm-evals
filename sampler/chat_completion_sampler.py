@@ -25,6 +25,7 @@ class ChatCompletionSampler(SamplerBase):
         temperature: float = 0.5,
         max_tokens: int = 1024,
     ):
+        super().__init__()
         self.api_key_name = "OPENAI_API_KEY"
         load_dotenv()
         self.client = OpenAI()
@@ -64,15 +65,21 @@ class ChatCompletionSampler(SamplerBase):
         trial = 0
         while True:
             try:
+                start_time = time.perf_counter()
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=message_list,
                     temperature=self.temperature,
                     max_tokens=self.max_tokens,
                 )
+                duration_ms = (time.perf_counter() - start_time) * 1000.0
                 content = response.choices[0].message.content
                 if content is None:
                     raise ValueError("OpenAI API returned empty response; retrying")
+                
+                # Record speed stats
+                self.speed_stats.record_request(duration_ms, len(content))
+                
                 return SamplerResponse(
                     response_text=content,
                     response_metadata={"usage": response.usage},
