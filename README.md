@@ -262,28 +262,14 @@ Ollama provides an OpenAI-compatible API that can be used with any OpenAI model 
 
 ```bash
 # Start Ollama
-ollama serve
+ollama run qwen3:1.7b
 
-# Pull a model
-ollama pull llama3.2
-
-# Run eval using OpenAI-compatible endpoint
-# Note: You'll need to set OPENAI_API_KEY to any value (it's required but ignored by Ollama)
-export OPENAI_API_KEY=ollama
-
-# Option 1: Use --model-override to specify the exact model name for your endpoint
+# Use --model-override to specify the exact model name for your endpoint
 uv run python -m simple_evals \
   --eval=mmlu \
   --model=gpt-4o \
   --openai-base-url=http://localhost:11434/v1/ \
   --model-override=llama3.2 \
-  --examples=10
-
-# Option 2: If your endpoint accepts any model name, you can use a predefined model key
-uv run python -m simple_evals \
-  --eval=mmlu \
-  --model=gpt-4o \
-  --openai-base-url=http://localhost:11434/v1/ \
   --examples=10
 ```
 
@@ -338,9 +324,6 @@ uv run python -m simple_evals \
 For custom OpenAI-compatible endpoints (like Docker containers), use both flags together:
 
 ```bash
-# Example: Custom Docker model at localhost:12434
-export OPENAI_API_KEY=dummy
-
 uv run python -m simple_evals \
   --eval=mmlu \
   --model=gpt-4o \
