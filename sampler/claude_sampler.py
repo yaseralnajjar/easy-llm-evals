@@ -32,6 +32,7 @@ class ClaudeCompletionSampler(SamplerBase):
         system_message: str | None = None,
         temperature: float = 0.0,  # default in Anthropic example
         max_tokens: int = 4096,
+        thinking_budget: int | None = None,
     ):
         super().__init__()
         load_dotenv()  # Load .env file
@@ -41,6 +42,7 @@ class ClaudeCompletionSampler(SamplerBase):
         self.system_message = system_message
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.thinking_budget = thinking_budget
         self.image_format = "base64"
 
     def _handle_image(
@@ -74,32 +76,60 @@ class ClaudeCompletionSampler(SamplerBase):
                     raise ValueError(f"Claude sampler only supports user and assistant messages, got {message_list}")
                 
                 start_time = time.perf_counter()
+                
+                # Calculate max_tokens: must be greater than thinking budget
+                max_tokens = self.max_tokens
+                if self.thinking_budget is not None and max_tokens <= self.thinking_budget:
+                    # Ensure max_tokens is at least thinking_budget + 1024 for response
+                    max_tokens = self.thinking_budget + 1024
+                
+                # Build API call parameters
+                api_params = {
+                    "model": self.model,
+                    "max_tokens": max_tokens,
+                    "messages": message_list,
+                }
+                
+                # Add thinking configuration if budget is specified
+                if self.thinking_budget is not None:
+                    api_params["thinking"] = {
+                        "type": "enabled",
+                        "budget_tokens": self.thinking_budget,
+                    }
+                    # When thinking is enabled, temperature must be 1
+                    api_params["temperature"] = 1.0
+                else:
+                    # Use configured temperature when thinking is disabled
+                    api_params["temperature"] = self.temperature
+                
+                # Add system message if provided
                 if self.system_message:
-                    response_message = self.client.messages.create(
-                        model=self.model,
-                        system=self.system_message,
-                        max_tokens=self.max_tokens,
-                        temperature=self.temperature,
-                        messages=message_list,
-                    )
+                    api_params["system"] = self.system_message
                     claude_input_messages: MessageList = [{"role": "system", "content": self.system_message}] + message_list
                 else:
-                    response_message = self.client.messages.create(
-                        model=self.model,
-                        max_tokens=self.max_tokens,
-                        temperature=self.temperature,
-                        messages=message_list,
-                    )
                     claude_input_messages = message_list
+                
+                response_message = self.client.messages.create(**api_params)
                 duration_ms = (time.perf_counter() - start_time) * 1000.0
-                response_text = response_message.content[0].text
+                
+                # Extract text from response content blocks
+                # Claude returns array of content blocks: [{"type": "thinking", ...}, {"type": "text", ...}]
+                response_text = ""
+                for content_block in response_message.content:
+                    if hasattr(content_block, 'type') and content_block.type == "text":
+                        response_text = content_block.text
+                        break
+                
+                # Fallback to old behavior if no text block found
+                if not response_text and len(response_message.content) > 0:
+                    response_text = response_message.content[0].text
                 
                 # Record speed stats
                 self.speed_stats.record_request(duration_ms, len(response_text))
                 
                 return SamplerResponse(
                     response_text=response_text,
-                    response_metadata={},
+                    response_metadata={"content_blocks": response_message.content},
                     actual_queried_message_list=claude_input_messages,
                 )
             except anthropic.RateLimitError as e:

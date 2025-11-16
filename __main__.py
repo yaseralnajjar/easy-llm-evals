@@ -83,7 +83,7 @@ def main():
         "--thinking-budget",
         type=int,
         default=None,
-        help="Thinking budget for Gemini models (0=disable, -1=dynamic, or specific token count). Disabled by default. Gemini 2.5 Pro: 128-32768, Flash: 0-24576. Higher values allow more reasoning.",
+        help="Thinking budget for Claude and Gemini models (token count). Disabled by default. Claude: min 1024, suggested 1k-32k. Gemini 2.5 Pro: 128-32768, Flash: 0-24576. Higher values allow more reasoning.",
     )
 
     args = parser.parse_args()
@@ -298,14 +298,17 @@ def main():
         "claude-sonnet-4-5": lambda: ClaudeCompletionSampler(
             model="claude-sonnet-4-5-20250929",
             system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+            thinking_budget=args.thinking_budget,
         ),
         "claude-haiku-4-5": lambda: ClaudeCompletionSampler(
             model="claude-haiku-4-5-20251001",
             system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+            thinking_budget=args.thinking_budget,
         ),
         "claude-opus-4-1": lambda: ClaudeCompletionSampler(
             model="claude-opus-4-1-20250805",
             system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
+            thinking_budget=args.thinking_budget,
         ),
         # Google Gemini models
         "gemini-2.5-pro": lambda: GeminiSampler(

@@ -184,6 +184,45 @@ uv run python -m simple_evals --eval=mmlu --model=claude-sonnet-4-5 --examples=1
 uv run python -m simple_evals --eval=healthbench --model=claude-sonnet-4-5 --grader-model=claude-sonnet-4-5 --examples=10
 ```
 
+#### Claude Extended Thinking
+
+Claude 4.1+ models support extended thinking for enhanced reasoning on complex tasks. Use `--thinking-budget` to control the token budget for internal reasoning:
+
+```bash
+# Enable extended thinking with moderate budget (1k-2k tokens for most tasks)
+uv run python -m simple_evals --eval=mmlu --model=claude-sonnet-4-5 --thinking-budget 2048 --examples=10
+
+# Higher budget for complex reasoning (math, coding)
+uv run python -m simple_evals --eval=math --model=claude-opus-4-1 --thinking-budget 10000 --examples=10
+
+# Fast model with thinking
+uv run python -m simple_evals --eval=gpqa --model=claude-haiku-4-5 --thinking-budget 1024 --examples=10
+
+# Maximum reasoning for very complex tasks
+uv run python -m simple_evals --eval=math --model=claude-sonnet-4-5 --thinking-budget 32000 --examples=10
+
+# Without thinking (default, faster and cheaper)
+uv run python -m simple_evals --eval=mmlu --model=claude-sonnet-4-5 --examples=10
+```
+
+**Token Budget Guidelines:**
+- **Minimum:** 1,024 tokens (required by Claude API)
+- **1k-2k:** Simple reasoning tasks, general Q&A
+- **2k-8k:** Standard problem solving, comparison tasks
+- **8k-16k:** Complex multi-step reasoning, coding tasks
+- **16k-32k+:** Advanced mathematics, complex algorithms, deep analysis
+
+**Notes:**
+- Claude may use less than the allocated budget
+- Thinking tokens are billed as output tokens
+- Higher budgets improve quality but increase latency and cost
+- Default behavior (no `--thinking-budget`): thinking is disabled
+- When thinking is enabled, temperature is automatically set to 1.0
+- max_tokens is automatically adjusted to be greater than thinking budget
+- Supported models: Claude Sonnet 4.5, Haiku 4.5, Opus 4.1
+
+**Reference:** [Claude Extended Thinking Documentation](https://docs.claude.com/en/docs/build-with-claude/extended-thinking)
+
 #### With Google Gemini Models
 
 ```bash
