@@ -77,7 +77,7 @@ def main():
         type=str,
         choices=["none", "minimal", "low", "medium", "high"],
         default=None,
-        help="Reasoning effort for reasoning models (none/minimal=fastest, low=faster, medium=balanced, high=best quality). GPT-5.1 uses 'none', GPT-5 uses 'minimal'. Applies to GPT-5, GPT-5.1, o3, o4-mini, etc.",
+        help="Reasoning effort for GPT reasoning models (none/minimal=fastest, low=faster, medium=balanced, high=best quality). GPT-5.1 uses 'none', GPT-5 uses 'minimal'. Applies to GPT-5, GPT-5.1, o3, o4-mini, etc.",
     )
     parser.add_argument(
         "--thinking-budget",
