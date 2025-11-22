@@ -519,6 +519,13 @@ def main():
             models = {
                 model_name: available_models[model_name]() for model_name in models_chosen
             }
+        
+        # If model_override is set, replace the model name keys with the override name
+        # This affects display names in results, file names, and print statements
+        # For multiple models, we don't want to override the model name keys
+        if args.model_override and len(models_chosen) == 1:
+                display_model_name = args.model_override.replace("/", "-")
+                models = {display_model_name: list(models.values())[0]}
 
     print(f"Running with args {args}")
 
